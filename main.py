@@ -27,6 +27,26 @@ class autonomous():
 		self.sData.get_data()
 		self.rud_error = 0
 		self.rud_prev_error = 0
+		self.declination = 0
+		
+		
+	def getDeclination(self):
+		lat1 = 'lat1=' + str(self.sData.lat)
+		lon1 = 'lon1=' + str(self.sData.lon)
+		KEY = 'key=' +'zNEw7' 
+		RESULT_FORMAT = 'resultFormat=' + 'json'
+		
+		params = [BASE_ADDRESS, lat1, lon1, KEY, RESULT_FORMAT]
+		address = '&'.join(params)
+		
+		response = requests.get(address)
+		if (response.status_code != requests.codes.ok):
+    			print("something went wrong")
+		else:
+    			magData = response.json()
+			self.declination = magData['result'][0]['declination']
+		return self.declination
+		
 		
 
 	def setCourse(self):
