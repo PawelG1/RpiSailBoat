@@ -7,33 +7,39 @@ import db_connection
 from simple_pid import PID
 import nanoconn as nc
 import math
+import json
+import requests
+
+
 
 db_connection.connect_to_db()
 
-
 pid = PID(1, 0.1, 0.05, setpoint=1)
 
-#tak = winch.sailWinch()
+#tak = winch.sailWinch() will be added in future
 #tak.winch_rs()
 time.sleep(2)
 
 class autonomous():
 	def __init__(self) -> None:
 		self.sData = nc.dataFAtmega()
-		self.t1 = Thread(target=mechanics.rudder_servo, args=(0,))
-		self.t1.start()
-		self.t2 = Thread(target=mechanics.boom_servo, args=(0,))
-		self.t2.start()
 		self.sData.get_data()
 		self.rud_error = 0
 		self.rud_prev_error = 0
 		self.declination = 0
+		self.t1 = Thread(target=mechanics.rudder_servo, args=(0,))
+		self.t1.start()
+		self.t2 = Thread(target=mechanics.boom_servo, args=(0,))
+		self.t2.start()
+		f = open('private.json')
+			self.KEYS = json.load(f)
+		f.close
 		
 		
 	def getDeclination(self):
 		lat1 = 'lat1=' + str(self.sData.lat)
 		lon1 = 'lon1=' + str(self.sData.lon)
-		KEY = 'key=' +'zNEw7' 
+		KEY = 'key=' + self.KEYS['key'] 
 		RESULT_FORMAT = 'resultFormat=' + 'json'
 		
 		params = [BASE_ADDRESS, lat1, lon1, KEY, RESULT_FORMAT]
