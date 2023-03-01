@@ -37,14 +37,19 @@ class dataFAtmega():
                 if ser.in_waiting > 0:
 
                     line = None
-                    line2 = ser.readline().decode('utf-8').rstrip()
-                    line = line2.split(',')
-                    self.windir = float(line[0])
-                    self.heading = float(line[1])
-                    self.lat = float(line[2])
-                    self.lon = float(line[3])
-                    self.time = time.time()
-                    return 0
+                    try:
+                        line2 = ser.readline().decode('utf-8').rstrip()
+                    
+                        line = line2.split(',')
+                        if(line[4] == '5*'): #if checksum is correct then save values
+                            self.windir = float(line[0])
+                            self.heading = float(line[1])
+                            self.lat = float(line[2]) / 10**6
+                            self.lon = float(line[3]) / 10**6
+                            self.time = time.time()
+                            return 0
+                    except:
+                        break
                 
            
         #if method hasn't got any data from atmega and it was 5s since last data then set defaults
