@@ -13,6 +13,13 @@ class stepper():
 		self.delay = 0.0025
 
 	def savepos(self, pos):
+		f = open("/home/pi/SailboatSoft/SailSoft/stepper_pos.json")
+		last_pos = json.load(f)
+		f.close
+		last_pos = int(last_pos['pos'])
+		print(last_pos)
+		pos = pos + last_pos
+		print(pos)
 		data = {
 			"pos": pos
 		}
@@ -34,6 +41,8 @@ class stepper():
 		time.sleep(0.00001)
 
 		self.savepos(degrees)
+
+		pi.write(self.DIR_PIN, pigpio.LOW)
 	
 
 			
@@ -61,9 +70,9 @@ if __name__ == '__main__':
 	pi.write(13, pigpio.HIGH)
 
 
-	winch.pull(360)
+	#winch.pull(360)
 	time.sleep(2)
-	#winch.loosen(360)
+	winch.loosen(360)
 
 	
 
