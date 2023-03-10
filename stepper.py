@@ -1,6 +1,7 @@
 from math import degrees
 import pigpio
 import time
+import json
 pi = pigpio.pi()
 
 class stepper():
@@ -10,6 +11,14 @@ class stepper():
 		self.stepPTurn = 1324 #steps per 1 turn
 		#stepper motor steps per rotation =200 , gearbox ratio 324/49
 		self.delay = 0.0025
+
+	def savepos(self, pos):
+		data = {
+			"pos": pos
+		}
+		with open("stepper_pos.json", "w") as outfile:
+			json.dump(data, outfile)
+
 
 	def pull(self, degrees): # input have to be in degrees
 		steps = int((degrees / 360) * self.stepPTurn)
@@ -23,6 +32,9 @@ class stepper():
 			pi.write(self.STEP_PIN, 0)
 
 		time.sleep(0.00001)
+
+		self.savepos(degrees)
+	
 
 			
 	def loosen(self, degrees):
@@ -38,6 +50,7 @@ class stepper():
 
 		time.sleep(0.00001)
 
+		self.savepos(-degrees)
 
 
 if __name__ == '__main__':
