@@ -16,7 +16,7 @@ class stepper():
 		data = {
 			"pos": pos
 		}
-		with open("stepper_pos.json", "w") as outfile:
+		with open("/home/pi/SailboatSoft/SailSoft/stepper_pos.json", "w") as outfile:
 			json.dump(data, outfile)
 
 
@@ -63,7 +63,9 @@ if __name__ == '__main__':
 
 	winch.pull(360)
 	time.sleep(2)
-	winch.loosen(360)
+	#winch.loosen(360)
+
+	
 
 	"""for i in range(1000):
 		time.sleep(delay)
