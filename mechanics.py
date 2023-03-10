@@ -1,8 +1,8 @@
 from logging import raiseExceptions
 import pigpio
 import time
-import winch_mod as winch
-
+from stepper import stepper
+import json
 
 pi = pigpio.pi()
 rudder = pigpio.pi()
@@ -10,10 +10,9 @@ prev_val = 0
 pi.set_PWM_frequency(12, 330)
 
 rudder.set_mode(12, pigpio.ALT5) 
-boom = pigpio.pi()
 
-tak = winch.sailWinch()
-tak.winch_rs()
+
+winch = stepper()
 time.sleep(4)
 
 def rudder_servo(in_val):
@@ -28,9 +27,31 @@ def rudder_servo(in_val):
 	time.sleep(0.9)
 
 
+def boom_reset(in_val):
+	f = open("/home/pi/SailboatSoft/SailSoft/stepper_pos.json")
+	last_pos = json.load(f)
+	f.close
+	last_pos = int(last_pos['pos'])
+
+	if(last_pos > 0):
+		winch.loosen(last_pos)
+		
+	if(last_pos < 0):
+		winch.pull(last_pos)
+
 def boom_servo(in_val):
-	tak.rotation(in_val)
-	time.sleep(2.9)
+	val = ((in_val - 0) * (720 - 0) / (180 - 0) + 0)
+
+	f = open("/home/pi/SailboatSoft/SailSoft/stepper_pos.json")
+	last_pos = json.load(f)
+	f.close
+	last_pos = int(last_pos['pos'])
+
+	if val > last_pos:
+		winch.pull(val - last_pos)
+	if val < last_pos:
+		winch.loosen(last_pos - val)
+	
 
 def motor_on():
 	pi.write(24, 1) #24[purple](2nd), 
@@ -52,18 +73,19 @@ def lights_off():
 if __name__ == "__main__":
 	while True:
 		try:
-			lights_on()
+			#lights_on()
 			motor_on()
-			time.sleep(5);motor_off()
+			time.sleep(3)
+			motor_off()
 			time.sleep(1)
-			#boom_servo(90)
-			time.sleep(3)
-			lights_off()
+			#boom_servo(0)
+			#time.sleep(3)
+			#lights_off()
 			#boom_servo(180)
-			time.sleep(3)
-			rudder_servo(90)
-			time.sleep(2)
-			rudder_servo(0)
+			#time.sleep(3)
+			#rudder_servo(90)
+			#time.sleep(2)
+			#rudder_servo(0)
 		except KeyboardInterrupt:
 
 			print("test ended")
